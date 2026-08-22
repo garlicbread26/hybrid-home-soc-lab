@@ -1,55 +1,662 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hybrid Home SOC Lab</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hybrid Home SOC Lab — network security, cloud infrastructure, Wazuh SIEM, detection engineering and SOC investigation.">
+  <title>Hybrid Home SOC Lab</title>
+
+  <style>
+    :root {
+      --bg: #07110d;
+      --panel: #0b1813;
+      --panel-2: #0e2019;
+      --border: #17392b;
+      --text: #e7f5ed;
+      --muted: #8ba99a;
+      --accent: #42f59b;
+      --accent-2: #1bd47c;
+      --warning: #ffd166;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background:
+        radial-gradient(circle at 20% 0%, rgba(66,245,155,.08), transparent 28%),
+        radial-gradient(circle at 90% 20%, rgba(27,212,124,.06), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(var(--max), calc(100% - 36px));
+      margin: auto;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(7,17,13,.82);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    .hero {
+      padding: 92px 0 70px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(66,245,155,.05);
+      font-size: .82rem;
+      margin-bottom: 22px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 5.2rem);
+      line-height: 1.02;
+      letter-spacing: -.045em;
+      margin-bottom: 22px;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .hero p {
+      max-width: 760px;
+      margin: auto;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 18px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      transition: .2s;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #04100a;
+      border-color: var(--accent);
+      font-weight: 800;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+
+    section { padding: 58px 0; }
+
+    .section-head {
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      margin-top: 5px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      max-width: 760px;
+      margin-top: 8px;
+    }
+
+    .architecture {
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(14,32,25,.9), rgba(11,24,19,.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow-x: auto;
+    }
+
+    .flow {
+      min-width: 720px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      gap: 12px;
+    }
+
+    .node {
+      padding: 18px 12px;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .node strong { display: block; }
+    .node small { color: var(--muted); }
+
+    .arrow {
+      text-align: center;
+      color: var(--accent);
+      font-size: 1.5rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      padding: 22px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: .2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(66,245,155,.55);
+    }
+
+    .card .icon {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .card h3 { margin-bottom: 6px; }
+
+    .card p {
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .tech {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 5px 9px;
+      border-radius: 6px;
+      background: rgba(66,245,155,.06);
+      border: 1px solid var(--border);
+      color: #bcebd1;
+      font-size: .78rem;
+    }
+
+    .docs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .doc {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 17px 18px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 11px;
+    }
+
+    .doc:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .doc small {
+      display: block;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .status {
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .status .state {
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .status h3 { margin-top: 5px; }
+
+    .timeline {
+      border-left: 1px solid var(--border);
+      margin-left: 8px;
+      padding-left: 25px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 22px;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      left: -30px;
+      top: 8px;
+      box-shadow: 0 0 12px rgba(66,245,155,.5);
+    }
+
+    .timeline-item p { color: var(--muted); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      margin-top: 30px;
+      padding: 30px 0 45px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .88rem;
+    }
+
+    @media (max-width: 850px) {
+      .cards { grid-template-columns: 1fr 1fr; }
+      .status-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .nav-links { display: none; }
+      .hero { padding-top: 65px; }
+      .cards, .docs, .status-grid { grid-template-columns: 1fr; }
+      .architecture { padding: 18px; }
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>Hybrid Home SOC Lab</h1>
+<nav>
+  <div class="container nav-inner">
+    <a class="brand" href="#"><span>▣</span> HYBRID HOME SOC LAB</a>
+    <div class="nav-links">
+      <a href="#architecture">Architecture</a>
+      <a href="#components">Components</a>
+      <a href="#docs">Documentation</a>
+      <a href="#status">Status</a>
+    </div>
+  </div>
+</nav>
 
-<p>
-A hybrid cybersecurity home lab designed to simulate a small
-Security Operations Center (SOC) environment using on-premises
-virtualization, network security, cloud infrastructure, endpoint
-telemetry, SIEM, detection engineering, SOC investigation and automation.
-</p>
+<header class="hero">
+  <div class="container">
+    <div class="badge"><span class="dot"></span> Personal Security Engineering Lab</div>
 
-<h2>Lab Architecture</h2>
+    <h1>Hybrid Home <span>SOC Lab</span></h1>
 
-<ul>
-    <li>Windows Physical Host</li>
-    <li>VMware Workstation Pro</li>
-    <li>pfSense Firewall</li>
-    <li>Suricata IDS/IPS</li>
-    <li>pfBlockerNG</li>
-    <li>Ubuntu Desktop Test/Defender VM</li>
-    <li>Oracle Cloud Infrastructure (OCI)</li>
-    <li>Wazuh SIEM</li>
-    <li>Windows Sysmon</li>
-    <li>Wazuh Agent</li>
-    <li>Kali Linux via Docker</li>
-    <li>Tailscale VPN</li>
-</ul>
+    <p>
+      A hands-on security environment combining network security, virtualization,
+      cloud infrastructure, SIEM, detection engineering and SOC investigation.
+      Built, tested and documented from the ground up.
+    </p>
 
-<h2>Documentation</h2>
+    <div class="actions">
+      <a class="btn primary" href="#architecture">Explore the Lab ↓</a>
+      <a class="btn" href="https://github.com/garlicbread26/hybrid-home-soc-lab" target="_blank" rel="noopener">View GitHub</a>
+    </div>
+  </div>
+</header>
 
-<ul>
-    <li><a href="01-Architecture/">01 - Architecture</a></li>
-    <li><a href="02-Network-Infrastructure/">02 - Network Infrastructure</a></li>
-    <li><a href="03-Virtualization/">03 - Virtualization</a></li>
-    <li><a href="04-Cloud-Infrastructure/">04 - Cloud Infrastructure</a></li>
-    <li><a href="05-Wazuh-SIEM/">05 - Wazuh SIEM</a></li>
-    <li><a href="06-Detection-Engineering/">06 - Detection Engineering</a></li>
-    <li><a href="07-SOC-Investigation/">07 - SOC Investigation</a></li>
-</ul>
+<main>
 
-<h2>Project Status</h2>
+<section id="architecture">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">01 / Architecture</div>
+      <h2>Security Architecture</h2>
+      <p>
+        Traffic flows through the network security layer before reaching the
+        isolated test environment, with cloud connectivity extending the lab.
+      </p>
+    </div>
 
-<p>
-The lab is actively being documented and expanded.
-</p>
+    <div class="architecture">
+      <div class="flow">
+        <div class="node">
+          <strong>Internet</strong>
+          <small>External Network</small>
+        </div>
+        <div class="arrow">→</div>
+
+        <div class="node">
+          <strong>Windows Host</strong>
+          <small>VMware Workstation Pro</small>
+        </div>
+        <div class="arrow">→</div>
+
+        <div class="node">
+          <strong>pfSense</strong>
+          <small>Firewall / Gateway</small>
+        </div>
+
+        <div></div>
+        <div class="arrow">↓</div>
+
+        <div class="node">
+          <strong>Guest VLAN</strong>
+          <small>Isolated Test Network</small>
+        </div>
+        <div class="arrow">→</div>
+
+        <div class="node">
+          <strong>Ubuntu VM</strong>
+          <small>Test / Defender</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="components">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">02 / Components</div>
+      <h2>Lab Components</h2>
+      <p>Core infrastructure used throughout the security lab.</p>
+    </div>
+
+    <div class="cards">
+
+      <article class="card">
+        <div class="icon">🛡️</div>
+        <h3>Network Security</h3>
+        <p>pfSense provides firewalling, routing, segmentation and traffic-control capabilities.</p>
+        <div class="tech">
+          <span class="tag">pfSense</span>
+          <span class="tag">VLAN</span>
+          <span class="tag">Firewall</span>
+          <span class="tag">pfBlockerNG</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="icon">🔎</div>
+        <h3>IDS / IPS</h3>
+        <p>Suricata inspects network traffic and provides security telemetry for detection workflows.</p>
+        <div class="tech">
+          <span class="tag">Suricata</span>
+          <span class="tag">IDS</span>
+          <span class="tag">IPS</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="icon">🖥️</div>
+        <h3>Virtualization</h3>
+        <p>VMware Workstation provides the local virtualization layer for controlled security testing.</p>
+        <div class="tech">
+          <span class="tag">VMware</span>
+          <span class="tag">Ubuntu</span>
+          <span class="tag">VMs</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="icon">☁️</div>
+        <h3>Cloud Infrastructure</h3>
+        <p>OCI extends the environment beyond the local host and provides a hybrid infrastructure component.</p>
+        <div class="tech">
+          <span class="tag">OCI</span>
+          <span class="tag">Cloud</span>
+          <span class="tag">Tailscale</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="icon">📊</div>
+        <h3>SIEM</h3>
+        <p>Wazuh provides centralized security monitoring, log analysis, alerting and endpoint visibility.</p>
+        <div class="tech">
+          <span class="tag">Wazuh</span>
+          <span class="tag">SIEM</span>
+          <span class="tag">Agents</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="icon">🧪</div>
+        <h3>Detection Engineering</h3>
+        <p>Security events are generated, detected, investigated and documented as repeatable workflows.</p>
+        <div class="tech">
+          <span class="tag">Telemetry</span>
+          <span class="tag">Detection</span>
+          <span class="tag">Investigation</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">03 / Documentation</div>
+      <h2>Explore the Lab</h2>
+      <p>Technical documentation is maintained inside the repository.</p>
+    </div>
+
+    <div class="docs">
+
+      <a class="doc" href="01-Architecture/">
+        <div>
+          <strong>01 — Architecture</strong>
+          <small>Overall lab design and architecture</small>
+        </div>
+        <span>→</span>
+      </a>
+
+      <a class="doc" href="02-Network-Infrastructure/">
+        <div>
+          <strong>02 — Network Infrastructure</strong>
+          <small>pfSense, VLAN, Suricata and network flow</small>
+        </div>
+        <span>→</span>
+      </a>
+
+      <a class="doc" href="03-Virtualization/">
+        <div>
+          <strong>03 — Virtualization</strong>
+          <small>VMware and virtual machines</small>
+        </div>
+        <span>→</span>
+      </a>
+
+      <a class="doc" href="04-Cloud-Infrastructure/">
+        <div>
+          <strong>04 — Cloud Infrastructure</strong>
+          <small>OCI and hybrid connectivity</small>
+        </div>
+        <span>→</span>
+      </a>
+
+      <a class="doc" href="05-Wazuh-SIEM/">
+        <div>
+          <strong>05 — Wazuh SIEM</strong>
+          <small>Security monitoring and telemetry</small>
+        </div>
+        <span>→</span>
+      </a>
+
+      <a class="doc" href="06-Detection-Engineering/">
+        <div>
+          <strong>06 — Detection Engineering</strong>
+          <small>Detection logic and security events</small>
+        </div>
+        <span>→</span>
+      </a>
+
+      <a class="doc" href="07-SOC-Investigation/">
+        <div>
+          <strong>07 — SOC Investigation</strong>
+          <small>Alert triage and investigation workflow</small>
+        </div>
+        <span>→</span>
+      </a>
+
+      <a class="doc" href="README.md">
+        <div>
+          <strong>Repository README</strong>
+          <small>Project overview and documentation index</small>
+        </div>
+        <span>→</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">04 / Lab Status</div>
+      <h2>Security Workflow</h2>
+      <p>The lab is designed around a continuous security lifecycle.</p>
+    </div>
+
+    <div class="status-grid">
+      <div class="status">
+        <div class="state">Active</div>
+        <h3>Network Security</h3>
+      </div>
+
+      <div class="status">
+        <div class="state">Active</div>
+        <h3>SIEM Monitoring</h3>
+      </div>
+
+      <div class="status">
+        <div class="state">Active</div>
+        <h3>Detection Engineering</h3>
+      </div>
+
+      <div class="status">
+        <div class="state">Active</div>
+        <h3>SOC Investigation</h3>
+      </div>
+    </div>
+
+    <div style="height:34px"></div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <strong>Generate activity</strong>
+        <p>Controlled activity is produced inside the isolated lab environment.</p>
+      </div>
+
+      <div class="timeline-item">
+        <strong>Collect telemetry</strong>
+        <p>Network and endpoint telemetry is collected by the security stack.</p>
+      </div>
+
+      <div class="timeline-item">
+        <strong>Detect</strong>
+        <p>Security rules and monitoring components identify suspicious activity.</p>
+      </div>
+
+      <div class="timeline-item">
+        <strong>Investigate</strong>
+        <p>Alerts are analyzed and documented as SOC investigation workflows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <strong>Hybrid Home SOC Lab</strong><br>
+    Built for hands-on security engineering, learning and documentation.
+  </div>
+</footer>
 
 </body>
 </html>
