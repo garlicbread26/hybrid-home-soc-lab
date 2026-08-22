@@ -66,3 +66,55 @@ The lab currently consists of:
         |                  |  |                  |
         | Kali via Docker  |  | Wazuh SIEM       |
         +------------------+  +------------------+
+
+## Architecture Components
+
+### Windows Physical Host
+
+The Windows laptop is the physical host for the on-premises portion of the lab.
+
+VMware Workstation Pro runs the local virtual infrastructure on this host.
+
+### VMware Workstation Pro
+
+VMware provides the virtualization layer for the local lab.
+
+The main virtual systems are:
+
+- pfSense firewall
+- Ubuntu Desktop test/defender VM
+
+### pfSense Security Layer
+
+pfSense acts as the network security gateway for the local environment.
+
+Security services deployed on pfSense include:
+
+- Suricata IDS/IPS
+- pfBlockerNG
+- Firewall rules
+- Guest VLAN
+- Syslog forwarding
+
+### Guest VLAN
+
+The Ubuntu Desktop test/defender VM is placed behind pfSense on the Guest VLAN.
+
+This provides an isolated environment for generating and observing security activity.
+
+### Tailscale VPN
+
+Tailscale provides private connectivity between the on-premises lab and OCI.
+
+It is used to overcome the CGNAT limitation of the home Internet connection.
+
+The connection path is:
+
+```text
+Local Lab
+    |
+  pfSense
+    |
+Tailscale
+    |
+  OCI VCN
