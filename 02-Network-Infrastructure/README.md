@@ -60,3 +60,36 @@ pfSense provides the primary network security and traffic-control layer for the 
                  |                     |
           Ubuntu CLI Instance    Wazuh Instance
           Kali via Docker        Wazuh SIEM
+
+
+## Network Security Architecture
+
+The local network is protected by a pfSense firewall running as a virtual machine under VMware Workstation Pro.
+
+### Security Components
+
+- pfSense firewall
+- Suricata IDS/IPS
+- pfBlockerNG
+- Guest VLAN
+- Syslog forwarding
+- Tailscale VPN connectivity
+
+### Local Network Flow
+
+```text
+Internet
+   |
+Windows Physical Host
+   |
+VMware Workstation Pro
+   |
+pfSense
+   |
++----------------------+
+|      Guest VLAN      |
++----------+-----------+
+           |
+    Ubuntu Desktop
+    Test / Defender
+       VM
