@@ -2,52 +2,67 @@
 
 ## Overview
 
-This lab is a hybrid cybersecurity environment combining local virtualization, network security, endpoint telemetry, cloud infrastructure, SIEM monitoring, security investigation, and automation.
+This lab is a hybrid home Security Operations Center (SOC) environment combining on-premises virtualization and network security with cloud infrastructure.
 
-## Architecture
+The lab currently consists of:
+
+- Windows physical host
+- VMware Workstation Pro
+- pfSense firewall
+- Suricata IDS/IPS
+- pfBlockerNG
+- Ubuntu Desktop test/defender VM
+- Oracle Cloud Infrastructure (OCI) VCN
+- Two OCI compute instances
+- Tailscale VPN for private connectivity and CGNAT bypass
+- Kali Linux running through Docker
+- Wazuh Server / SIEM
+- Windows Sysmon telemetry
+- Wazuh Agent
+- pfSense Syslog telemetry
+
+## Network Architecture
 
 ```text
                          INTERNET
                             |
-                            v
-                 +---------------------+
-                 |    Windows Host     |
-                 |      Laptop         |
-                 +----------+----------+
                             |
-                     VMware Workstation
+                  +--------------------+
+                  |   Windows Host     |
+                  |   Physical Laptop  |
+                  |                    |
+                  | VMware Workstation |
+                  +---------+----------+
                             |
-              +-------------+-------------+
-              |                           |
-              v                           v
-       +-------------+             +-------------+
-       |   pfSense   |             |    Ubuntu   |
-       |  Firewall   |             |   Test VM   |
-       +-------------+             +-------------+
+                     +------+------+
+                     |   pfSense   |
+                     |  Firewall   |
+                     |            |
+                     |  Suricata  |
+                     | pfBlockerNG|
+                     +------+------+
+                            |
+                     Local Lab Network
+                            |
+                   +--------+--------+
+                   |                 |
+          +--------+-------+   +-----+----------+
+          | Ubuntu Desktop |   | Windows Host   |
+          | Test/Defender  |   | Sysmon         |
+          | VM             |   | Wazuh Agent    |
+          +----------------+   +----------------+
 
-                 Windows Endpoint
-                        |
-                     Sysmon
-                        |
-                   Wazuh Agent
-                        |
-                        | Security Telemetry
-                        v
-              +----------------------+
-              | Oracle Cloud (Mumbai)|
-              |                      |
-              |    Wazuh Server      |
-              |       / SIEM         |
-              +----------+-----------+
-                         |
-                         v
-                      Alerts
-                         |
-                         v
-                    Investigation
-                         |
-                         v
-                Detection Engineering
-                         |
-                         v
-                     Automation
+                            |
+                       Tailscale VPN
+                       CGNAT Bypass
+                            |
+                            |
+                 +----------+-----------+
+                 |       OCI VCN        |
+                 |                      |
+        +--------+---------+  +---------+--------+
+        | Ubuntu CLI       |  | Wazuh Server     |
+        | OCI Instance     |  | OCI Instance     |
+        |                  |  |                  |
+        | Kali via Docker  |  | Wazuh SIEM       |
+        +------------------+  +------------------+
