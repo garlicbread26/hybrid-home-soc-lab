@@ -1,65 +1,76 @@
 # Hybrid Home SOC Lab
 
-A hybrid cybersecurity home lab designed to simulate a small Security Operations Center (SOC) environment using on-premises virtualization, network security, cloud infrastructure, endpoint telemetry, SIEM, detection engineering, investigation, and automation.
+A hybrid cybersecurity home lab built to simulate a small Security Operations Center (SOC) using on-premises virtualization, network security, cloud infrastructure, endpoint telemetry, SIEM monitoring, detection engineering, and security investigation.
 
 ## Lab Overview
 
-This project combines:
+The lab combines a local virtualized network environment with Oracle Cloud Infrastructure (OCI).
 
-- VMware-based virtual machines
-- pfSense network security
-- Ubuntu/Linux systems
-- Windows endpoint monitoring
-- Wazuh SIEM/XDR
-- Sysmon
-- Oracle Cloud Infrastructure (OCI)
-- Network segmentation
-- Security event detection
-- SOC investigation
-- Python-based security automation
+The current environment consists of:
 
-## Objectives
+- Windows physical host
+- VMware Workstation Pro
+- pfSense firewall
+- Suricata IDS/IPS
+- pfBlockerNG
+- Ubuntu Desktop test/defender VM
+- Oracle Cloud Infrastructure (OCI) VCN
+- Tailscale VPN for CGNAT bypass and connectivity between the local lab and OCI
+- Ubuntu CLI OCI instance
+- Kali Linux running through Docker
+- Wazuh Server / SIEM OCI instance
+- Sysmon endpoint telemetry
+- pfSense syslog telemetry
+- Wazuh-based log collection, detection and investigation
 
-- Build a realistic SOC-style environment at home
-- Collect security telemetry from Windows and Linux endpoints
-- Detect authentication attacks and suspicious activity
-- Investigate security alerts using Wazuh
-- Develop custom detection logic
-- Automate repetitive SOC investigation tasks
-- Document the complete infrastructure and security workflow
+## Network Architecture
 
-## Architecture
+```text
+                              INTERNET
+                                  |
+                                  |
+                    +-------------------------+
+                    |     Windows Host        |
+                    |                         |
+                    |  VMware Workstation Pro |
+                    +------------+------------+
+                                 |
+                                 |
+                    +------------+------------+
+                    |         pfSense         |
+                    |                         |
+                    |  Firewall               |
+                    |  Suricata IDS/IPS       |
+                    |  pfBlockerNG             |
+                    +------------+------------+
+                                 |
+                         Guest VLAN / LAN
+                                 |
+                    +------------+------------+
+                    |                         |
+          +---------+---------+     +---------+---------+
+          | Ubuntu Desktop   |     | Windows Host      |
+          | Test / Defender  |     | Sysmon             |
+          | VM               |     | Endpoint Telemetry |
+          +------------------+     +--------------------+
+                                           |
+                                           |
+                                      Security Logs
 
-The lab consists of on-premises virtualized systems connected with cloud infrastructure hosted on OCI.
 
-## Security Monitoring
-
-Wazuh acts as the central SIEM/security monitoring platform.
-
-Endpoint telemetry includes:
-
-- Windows Security Events
-- Sysmon events
-- Linux authentication logs
-- SSH authentication activity
-- Process and discovery activity
-
-## Detection Engineering
-
-Custom Wazuh rules and alert analysis are used to identify suspicious activity such as:
-
-- SSH brute-force attacks
-- Suspicious PowerShell activity
-- Suspicious process execution
-- File/directory deletion
-- System discovery activity
-
-## SOC Investigation
-
-Detected events are investigated using Wazuh alerts and supporting logs.
-
-The lab also includes Python automation for generating structured SOC incident reports from security telemetry.
-
-## Status
-
-🚧 Actively developing and documenting the lab.
+                         Tailscale VPN
+                       (CGNAT Bypass)
+                              |
+                              |
+                    +---------+---------+
+                    |     OCI VCN       |
+                    +---------+---------+
+                       |             |
+                       |             |
+              +--------+-----+  +----+-------------+
+              | Ubuntu CLI   |  | Wazuh Server      |
+              | OCI Instance |  | OCI Instance      |
+              |              |  |                   |
+              | Kali via     |  | Wazuh SIEM        |
+              | Docker       |  |                   |
+              +--------------+  +-------------------+
