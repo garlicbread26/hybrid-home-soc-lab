@@ -118,3 +118,29 @@ Local Lab
 Tailscale
     |
   OCI VCN
+
+
+![VMware Host](01-VMware.png)
+
+![pfSense Configuration](02-VMware.png)
+
+![Ubuntu Test VM](03-VMware.png)
+
+![VMware Network Configuration](04-VMware.png)
+
+## Cloud Architecture
+
+The cloud portion runs inside an Oracle Cloud Infrastructure VCN using two compute instances.
+
+![OCI VCN](05-VCN.png)
+
+![VCN IP Administration](06-VCN-ip-administration.png)
+
+![OCI Compute Instances](07-OCI-instance.png)
+
+## Private Connectivity
+
+Tailscale provides private connectivity between the on-premises lab and cloud infrastructure, allowing communication without relying directly on public addressing.
+
+![Tailscale Network](08-tailscale-network.png)
+
