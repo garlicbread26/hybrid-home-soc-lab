@@ -1,76 +1,76 @@
 # Hybrid Home SOC Lab
 
-A hybrid cybersecurity home lab built to simulate a small Security Operations Center (SOC) using on-premises virtualization, network security, cloud infrastructure, endpoint telemetry, SIEM monitoring, detection engineering, and security investigation.
+A hands-on hybrid Security Operations Center (SOC) lab combining a local virtualized security environment with Oracle Cloud Infrastructure.
 
-## Lab Overview
-
-The lab combines a local virtualized network environment with Oracle Cloud Infrastructure (OCI).
-
-The current environment consists of:
-
-- Windows physical host
-- VMware Workstation Pro
-- pfSense firewall
-- Suricata IDS/IPS
-- pfBlockerNG
-- Ubuntu Desktop test/defender VM
-- Oracle Cloud Infrastructure (OCI) VCN
-- Tailscale VPN for CGNAT bypass and connectivity between the local lab and OCI
-- Ubuntu CLI OCI instance
-- Kali Linux running through Docker
-- Wazuh Server / SIEM OCI instance
-- Sysmon endpoint telemetry
-- pfSense syslog telemetry
-- Wazuh-based log collection, detection and investigation
-
-## Network Architecture
+## What I Built
 
 ```text
-                              INTERNET
-                                  |
-                                  |
-                    +-------------------------+
-                    |     Windows Host        |
-                    |                         |
-                    |  VMware Workstation Pro |
-                    +------------+------------+
-                                 |
-                                 |
-                    +------------+------------+
-                    |         pfSense         |
-                    |                         |
-                    |  Firewall               |
-                    |  Suricata IDS/IPS       |
-                    |  pfBlockerNG             |
-                    +------------+------------+
-                                 |
-                         Guest VLAN / LAN
-                                 |
-                    +------------+------------+
-                    |                         |
-          +---------+---------+     +---------+---------+
-          | Ubuntu Desktop   |     | Windows Host      |
-          | Test / Defender  |     | Sysmon             |
-          | VM               |     | Endpoint Telemetry |
-          +------------------+     +--------------------+
-                                           |
-                                           |
-                                      Security Logs
+Windows Host
+     |
+VMware Workstation Pro
+     |
+   pfSense
+   ├── Suricata
+   ├── pfBlockerNG
+   └── Guest VLAN
+          |
+    Ubuntu Desktop
+    Test / Defender
 
+        Tailscale VPN
+        CGNAT Bypass
+              |
+           OCI VCN
+          /       \
+ Ubuntu CLI      Wazuh
+    |             |
+Kali/Docker      SIEM
 
-                         Tailscale VPN
-                       (CGNAT Bypass)
-                              |
-                              |
-                    +---------+---------+
-                    |     OCI VCN       |
-                    +---------+---------+
-                       |             |
-                       |             |
-              +--------+-----+  +----+-------------+
-              | Ubuntu CLI   |  | Wazuh Server      |
-              | OCI Instance |  | OCI Instance      |
-              |              |  |                   |
-              | Kali via     |  | Wazuh SIEM        |
-              | Docker       |  |                   |
-              +--------------+  +-------------------+
+SOC-HOME-LAB/
+│
+├── README.md
+│
+├── 01-Architecture/
+│   ├── topology.md
+│   ├── network-diagram.png
+│   └── ip-addressing.md
+│
+├── 02-Network/
+│   ├── pfsense.md
+│   ├── vlans.md
+│   ├── firewall-rules.md
+│   └── tailscale.md
+│
+├── 03-Virtualization/
+│   ├── vmware.md
+│   └── virtual-machines.md
+│
+├── 04-Cloud/
+│   ├── oci.md
+│   ├── networking.md
+│   └── wazuh-deployment.md
+│
+├── 05-Wazuh/
+│   ├── installation.md
+│   ├── agents.md
+│   ├── rules.md
+│   ├── dashboards.md
+│   └── syslog.md
+│
+├── 06-Detection/
+│   ├── windows-events.md
+│   ├── linux-events.md
+│   ├── authentication.md
+│   └── network-events.md
+│
+├── 07-Investigation/
+│   ├── incident-01.md
+│   ├── incident-02.md
+│   └── incident-03.md
+│
+├── 08-Troubleshooting/
+│   ├── wazuh-connectivity.md
+│   ├── oci-ip-change.md
+│   └── routing.md
+│
+└── screenshots/
