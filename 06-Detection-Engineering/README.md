@@ -1,53 +1,165 @@
-# Detection Engineering
+# 06 — Detection Engineering
 
 ## Overview
 
-Detection engineering focuses on creating, testing, and improving security detections within the Wazuh SIEM.
+This phase of the SOC home lab focuses on detection engineering using Wazuh.
 
-The lab uses controlled attack activity and endpoint/network telemetry to validate detection logic.
+The objective was to create, test, and validate custom SIEM detection rules for common attack, reconnaissance, endpoint, and privilege-related activities.
 
-## Detection Sources
-
-Current detection data comes from:
-
-- pfSense syslog
-- Windows Sysmon
-- SSH authentication logs
-- Linux authentication activity
-- Wazuh agent telemetry
-
-## Current Detections
-
-The lab currently focuses on detecting and investigating:
-
-- SSH brute-force activity
-- Repeated SSH authentication failures
-- Suspicious authentication activity
-- Suspicious process execution
-- File and directory activity
-- System discovery activity
-- Windows security events
-
-## Detection Workflow
+The detection workflow used throughout this phase was:
 
 ```text
-Controlled Security Activity
-          |
-          v
-   Network / Endpoint
-       Telemetry
-          |
-          v
-     Wazuh Server
-          |
-          v
-    Detection Rules
-          |
-          v
-        Alert
-          |
-          v
-     Investigation
-          |
-          v
- Detection Improvement
+Attack / Reconnaissance Activity
+            ↓
+Endpoint / Application Logs
+            ↓
+Wazuh Agent
+            ↓
+Wazuh Manager
+            ↓
+Custom Detection Rules
+            ↓
+MITRE ATT&CK Mapping
+            ↓
+Wazuh Alert
+            ↓
+SOC Investigation
+```
+
+## Detection Coverage
+
+The following custom Wazuh rules were created and validated during this phase:
+
+| Rule ID | Detection | Level | MITRE ATT&CK |
+|---|---|---:|---|
+| 100010 | SQL Injection / UNION SELECT | 10 | T1190 |
+| 100011 | Path Traversal | 10 | T1190 |
+| 100012 | Command Injection | 10 | T1059 |
+| 100013 | Web Reconnaissance / Scanner | 8 | T1595 |
+| 100014 | SSH Brute Force | 10 | T1110 |
+| 100015 | Suspicious PowerShell Execution | 10 | T1059.001 |
+| 100016 | Linux Privilege Escalation / Suspicious Sudo | 8 | T1548.003 |
+| 100017 | Network Discovery / Enumeration | 10 | T1016 |
+
+---
+
+## Custom Rule Implementation
+
+The custom detection rules were implemented in the Wazuh local rules configuration:
+
+```text
+/var/ossec/etc/rules/local_rules.xml
+```
+
+The rules were tested using Wazuh Logtest before being validated against live activity.
+
+For each detection, the validation process followed:
+
+```text
+Test Activity
+      ↓
+Wazuh Event
+      ↓
+Decoder
+      ↓
+Custom Rule Matching
+      ↓
+MITRE ATT&CK Mapping
+      ↓
+Wazuh Alert
+```
+
+---
+
+## Live Detection Results
+
+The custom rules were tested against controlled activity generated within the SOC lab.
+
+The generated events were successfully detected by Wazuh and appeared in the Threat Hunting interface with the expected rule IDs, severity levels, and detection descriptions.
+
+The following detections were verified:
+
+| Rule ID | Detection | Result |
+|---|---|---|
+| 100010 | SQL Injection / UNION SELECT | Detected |
+| 100011 | Path Traversal | Detected |
+| 100012 | Command Injection | Detected |
+| 100013 | Web Reconnaissance / Scanner | Detected |
+| 100014 | SSH Brute Force | Detected |
+| 100015 | Suspicious PowerShell Execution | Detected |
+| 100016 | Linux Privilege Escalation / Suspicious Sudo | Detected |
+| 100017 | Network Discovery / Enumeration | Detected |
+
+The screenshots in this directory provide visual evidence of the corresponding Wazuh alerts and the activity that triggered them.
+
+---
+
+## Detection Evidence
+
+The evidence is organized in the following order:
+
+1. `01-sql-injection-logtest.png` — SQL Injection Logtest validation
+2. `02-detection-overview.png` — Detection overview
+3. `03-sql-injection-detection.png` — SQL Injection live detection
+4. `04-path-traversal-detection.png` — Path Traversal live detection
+5. `05-command-injection-detection.png` — Command Injection live detection
+6. `06-web-recon-detection.png` — Web Reconnaissance detection
+7. `07-ssh-brute-force-detection.png` — SSH Brute Force detection
+8. `08-powershell-detection-logtest.png` — PowerShell detection and Logtest validation
+9. `09-linux-privilege-escalation.png` — Linux Privilege Escalation detection
+10. `10-discovery-detection.png` — Network Discovery detection
+11. `11-detection-rules-validation.png` — Detection rules validation
+12. `12-wazuh-custom-rules(part1).png` — Wazuh custom rules — Part 1
+13. `13-wazuh-custom-rules(part2).png` — Wazuh custom rules — Part 2
+14. `14-wazuh-custom-rules(part3).png` — Wazuh custom rules — Part 3
+
+Together, these screenshots document the rule creation, validation, attack simulation, and resulting SIEM alerts.
+
+Together, these screenshots document the rule creation, validation, attack simulation, and resulting SIEM alerts.
+
+---
+
+## Outcome
+
+This phase successfully established and validated a custom detection layer within the Wazuh SIEM.
+
+The detections were tested through both simulated activity and Wazuh Logtest, providing an end-to-end validation from event generation to alert visibility in the Threat Hunting interface.
+
+The completed workflow was:
+
+```text
+Controlled Activity
+        ↓
+Endpoint / Application Logs
+        ↓
+Wazuh Agent
+        ↓
+Wazuh Manager
+        ↓
+Custom Detection Rule
+        ↓
+MITRE ATT&CK Mapping
+        ↓
+Wazuh Alert
+        ↓
+Threat Hunting
+```
+
+## Next Steps
+
+The detection-engineering phase establishes the foundation for investigating security alerts generated by the SIEM.
+
+The next phase will focus on:
+
+- Investigating generated alerts
+- Reviewing event context and affected systems
+- Correlating related security events
+- Identifying attack techniques and indicators
+- Mapping observed activity to MITRE ATT&CK
+- Determining the severity and potential impact
+- Documenting investigation findings
+- Developing an incident-response workflow
+
+The next phase of the SOC home lab is:
+
+**07 — SOC Investigation**
