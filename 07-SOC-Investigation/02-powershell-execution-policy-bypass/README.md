@@ -31,12 +31,15 @@ The rule is based on Wazuh rule `92027` and matches the PowerShell command line 
         <id>T1059.001</id>
     </mitre>
 </rule>
+```
+
 ## 4. Attack Simulation
 
 The detection was validated by executing PowerShell with the `-ExecutionPolicy Bypass` parameter:
 
 ```powershell
 powershell.exe -NoProfile -Command "Get-Process"
+```
 
 ## 5. Detection Validation
 
@@ -93,22 +96,36 @@ The investigation provides visibility into suspicious PowerShell execution and d
 ## 10. Evidence Screenshots
 
 ### 10.1 PowerShell Execution
-PowerShell process execution with `-ExecutionPolicy Bypass`.
+
+![PowerShell Execution](screenshots/01-powershell-execution.png)
 
 ### 10.2 Wazuh Alert
-Wazuh detected the activity using custom rule `100015` with alert level `10`.
 
-### 10.3 Alert Details
-Wazuh alert metadata showing the command line, process information, user, integrity level, and SHA256 hash.
+![Wazuh Alert](screenshots/02-wazuh-alerts.png)
 
-### 10.4 Custom Rule
-Wazuh rule `100015` and its detection logic based on rule `92027`.
+### 10.3 Wazuh Rule Details
 
-### 10.5 Threat Hunting
-Threat Hunting view showing repeated detections from the Windows endpoint.
+![Wazuh Rule Details](screenshots/03-wazuh-rule-details.png)
 
-### 10.6 Process Output
-PowerShell `Get-Process` output generated during the detection test.
+### 10.4 Wazuh Alert Details
+
+![Wazuh Alert Details](screenshots/04-wazuh-alert-details.png)
+
+### 10.5 Wazuh Context
+
+![Wazuh Context](screenshots/05-wazuh-context.png)
+
+### 10.6 Sysmon Event Details
+
+![Sysmon Event Details](screenshots/06-sysmon-event-details.png)
+
+### 10.7 Sysmon Process Creation
+
+![Sysmon Process Creation](screenshots/07-sysmon-process-creation.png)
+
+### 10.8 Wazuh Alert JSON
+
+![Wazuh Alert JSON](screenshots/08-wazuh-alert-json.png)
 
 ## 11. SOC Detection Workflow
 
@@ -161,4 +178,3 @@ This approach allows the detection to focus specifically on suspicious PowerShel
 The PowerShell `-ExecutionPolicy Bypass` activity was successfully detected by Wazuh using custom rule `100015`.
 
 The investigation confirmed the complete detection path from Windows endpoint telemetry through Sysmon and Wazuh to the final SOC alert.
-
