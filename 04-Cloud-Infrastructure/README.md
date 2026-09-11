@@ -64,3 +64,4 @@ Ubuntu CLI         Wazuh Server
 Instance           Instance
    |                   |
 Kali via Docker    Wazuh SIEM
+```
