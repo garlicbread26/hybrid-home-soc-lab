@@ -2,532 +2,1306 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hybrid Home SOC Lab — network security, ELK-based log analysis, detection engineering, SOC investigation, and automation on a fully local home lab.">
-  <title>Hybrid Home SOC Lab</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Hybrid Home SOC Lab — Wazuh SIEM, pfSense, Suricata, Sysmon, Oracle Cloud, Tailscale, Docker, Kali Linux, detection engineering and SOC investigation."
+  >
+
+  <meta name="theme-color" content="#080611">
+
+  <title>Hybrid Home SOC Lab | SOC Engineering Portfolio</title>
 
   <style>
+
+    /* =========================================================
+       ROOT
+    ========================================================= */
+
     :root {
-      --bg: #07110d;
-      --panel: #0b1813;
-      --panel-2: #0e2019;
-      --border: #17392b;
-      --text: #e7f5ed;
-      --muted: #8ba99a;
-      --accent: #42f59b;
-      --accent-2: #1bd47c;
+      --bg: #080611;
+      --bg-2: #0d0918;
+
+      --panel: #110d1d;
+      --panel-2: #171126;
+      --panel-3: #1d1530;
+
+      --border: #2c1d4a;
+      --border-hover: #6d3fd1;
+
+      --text: #f4efff;
+      --muted: #a89fba;
+
+      --accent: #a970ff;
+      --accent-2: #7c3aed;
+      --accent-3: #c084fc;
+
+      --success: #63e6be;
       --warning: #ffd166;
+      --danger: #ff6b81;
+      --info: #7dd3fc;
+
       --max: 1180px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+    /* =========================================================
+       RESET
+    ========================================================= */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       background:
-        radial-gradient(circle at 20% 0%, rgba(66,245,155,.08), transparent 28%),
-        radial-gradient(circle at 90% 20%, rgba(27,212,124,.06), transparent 25%),
+        radial-gradient(
+          circle at 15% 0%,
+          rgba(124, 58, 237, .18),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 90% 15%,
+          rgba(169, 112, 255, .12),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 50% 100%,
+          rgba(192, 132, 252, .06),
+          transparent 35%
+        ),
         var(--bg);
+
       color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
       line-height: 1.6;
+      min-height: 100vh;
     }
 
-    a { color: inherit; text-decoration: none; }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-    .container { width: min(var(--max), calc(100% - 36px)); margin: auto; }
+    button {
+      font: inherit;
+    }
+
+    .container {
+      width: min(
+        var(--max),
+        calc(100% - 36px)
+      );
+
+      margin: auto;
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
 
     nav {
       position: sticky;
       top: 0;
-      z-index: 10;
-      backdrop-filter: blur(14px);
-      background: rgba(7,17,13,.82);
-      border-bottom: 1px solid var(--border);
+      z-index: 100;
+
+      backdrop-filter: blur(18px);
+
+      background:
+        rgba(8, 6, 17, .78);
+
+      border-bottom:
+        1px solid rgba(169, 112, 255, .18);
+
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, .25);
     }
 
     .nav-inner {
-      min-height: 66px;
+      min-height: 68px;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       gap: 20px;
     }
 
-    .brand { font-weight: 800; letter-spacing: .04em; }
-    .brand span { color: var(--accent); }
+    .brand {
+      font-weight: 900;
+      letter-spacing: .045em;
 
-    .nav-links { display: flex; gap: 20px; color: var(--muted); font-size: .92rem; }
-    .nav-links a:hover { color: var(--accent); }
+      font-size: .92rem;
 
-    .hero { padding: 92px 0 70px; text-align: center; }
+      white-space: nowrap;
+    }
+
+    .brand-symbol {
+      color: var(--accent);
+
+      text-shadow:
+        0 0 14px rgba(169, 112, 255, .8);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+
+      color: var(--muted);
+
+      font-size: .88rem;
+    }
+
+    .nav-links a {
+      transition: .2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+
+      text-shadow:
+        0 0 10px rgba(169, 112, 255, .45);
+    }
+
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+
+    .hero {
+      position: relative;
+
+      padding:
+        105px
+        0
+        80px;
+
+      text-align: center;
+
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+
+      position: absolute;
+
+      width: 520px;
+      height: 520px;
+
+      left: 50%;
+      top: -300px;
+
+      transform:
+        translateX(-50%);
+
+      background:
+        rgba(124, 58, 237, .15);
+
+      filter:
+        blur(110px);
+
+      border-radius: 50%;
+
+      pointer-events: none;
+    }
 
     .badge {
+      position: relative;
+
       display: inline-flex;
+
       align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border: 1px solid var(--border);
+      gap: 9px;
+
+      padding:
+        7px
+        13px;
+
+      border:
+        1px solid
+        rgba(169, 112, 255, .28);
+
       border-radius: 999px;
-      color: var(--accent);
-      background: rgba(66,245,155,.05);
-      font-size: .82rem;
-      margin-bottom: 22px;
+
+      color:
+        var(--accent-3);
+
+      background:
+        rgba(124, 58, 237, .07);
+
+      font-size: .8rem;
+
+      margin-bottom: 23px;
     }
 
     .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background:
+        var(--success);
+
+      box-shadow:
+        0 0 13px
+        rgba(99, 230, 190, .8);
     }
 
     h1 {
-      font-size: clamp(2.4rem, 6vw, 5.2rem);
-      line-height: 1.02;
-      letter-spacing: -.045em;
-      margin-bottom: 22px;
-    }
-    h1 span { color: var(--accent); }
+      position: relative;
 
-    .hero p { max-width: 780px; margin: auto; color: var(--muted); font-size: 1.08rem; }
+      font-size:
+        clamp(
+          2.5rem,
+          6vw,
+          5.3rem
+        );
+
+      line-height: 1.02;
+
+      letter-spacing: -.055em;
+
+      margin-bottom: 23px;
+    }
+
+    h1 span {
+      background:
+        linear-gradient(
+          90deg,
+          #a970ff,
+          #c084fc,
+          #8b5cf6
+        );
+
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      -webkit-text-fill-color: transparent;
+
+      text-shadow:
+        0 0 35px
+        rgba(169, 112, 255, .15);
+    }
+
+    .hero p {
+      position: relative;
+
+      max-width: 790px;
+
+      margin: auto;
+
+      color: var(--muted);
+
+      font-size:
+        clamp(
+          .98rem,
+          2vw,
+          1.08rem
+        );
+    }
+
+
+    /* =========================================================
+       BUTTONS
+    ========================================================= */
 
     .actions {
-      margin-top: 30px;
+      position: relative;
+
+      margin-top: 31px;
+
       display: flex;
+
       justify-content: center;
+
       flex-wrap: wrap;
+
       gap: 12px;
     }
 
     .btn {
       display: inline-flex;
+
       align-items: center;
       justify-content: center;
-      padding: 11px 18px;
+
+      padding:
+        11px
+        19px;
+
       border-radius: 9px;
-      border: 1px solid var(--border);
-      background: var(--panel);
-      transition: .2s;
+
+      border:
+        1px solid
+        var(--border);
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,.035),
+          rgba(255,255,255,.015)
+        );
+
+      color: var(--text);
+
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
     }
 
-    .btn.primary { background: var(--accent); color: #04100a; border-color: var(--accent); font-weight: 800; }
-    .btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .btn.primary {
+      background:
+        linear-gradient(
+          135deg,
+          #a970ff,
+          #7c3aed
+        );
 
-    section { padding: 58px 0; }
+      color: white;
 
-    .section-head { margin-bottom: 28px; }
+      border-color:
+        #a970ff;
+
+      box-shadow:
+        0 0 25px
+        rgba(124, 58, 237, .25);
+
+      font-weight: 800;
+    }
+
+    .btn:hover {
+      transform:
+        translateY(-2px);
+
+      border-color:
+        var(--accent);
+
+      box-shadow:
+        0 8px 25px
+        rgba(124, 58, 237, .18);
+    }
+
+
+    /* =========================================================
+       SECTIONS
+    ========================================================= */
+
+    section {
+      padding: 62px 0;
+    }
+
+    .section-head {
+      margin-bottom: 28px;
+    }
 
     .eyebrow {
       color: var(--accent);
-      font-size: .78rem;
-      font-weight: 800;
-      letter-spacing: .15em;
+
+      font-size: .76rem;
+
+      font-weight: 900;
+
+      letter-spacing: .16em;
+
       text-transform: uppercase;
     }
 
-    h2 { font-size: clamp(1.8rem, 4vw, 2.7rem); margin-top: 5px; }
-    .section-head p { color: var(--muted); max-width: 760px; margin-top: 8px; }
+    h2 {
+      font-size:
+        clamp(
+          1.8rem,
+          4vw,
+          2.7rem
+        );
+
+      letter-spacing: -.035em;
+
+      margin-top: 5px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+
+      max-width: 780px;
+
+      margin-top: 8px;
+    }
+
+
+    /* =========================================================
+       ARCHITECTURE
+    ========================================================= */
 
     .architecture {
       padding: 28px;
-      background: linear-gradient(180deg, rgba(14,32,25,.9), rgba(11,24,19,.9));
-      border: 1px solid var(--border);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(23,17,38,.95),
+          rgba(13,9,24,.95)
+        );
+
+      border:
+        1px solid
+        var(--border);
+
       border-radius: 16px;
+
       overflow-x: auto;
+
+      box-shadow:
+        0 15px 45px
+        rgba(0,0,0,.2);
+    }
+
+    .architecture-title {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 24px;
+
+      gap: 20px;
+    }
+
+    .architecture-title strong {
+      font-size: 1rem;
+    }
+
+    .architecture-title span {
+      color: var(--muted);
+
+      font-size: .78rem;
     }
 
     .flow {
-      min-width: 760px;
+      min-width: 850px;
+
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+
+      grid-template-columns:
+        1fr
+        35px
+        1fr
+        35px
+        1fr
+        35px
+        1fr;
+
       align-items: center;
-      gap: 12px;
-    }
 
-    .node {
-      padding: 18px 10px;
-      text-align: center;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--panel);
-    }
-
-    .node strong { display: block; }
-    .node small { color: var(--muted); }
-
-    .arrow { text-align: center; color: var(--accent); font-size: 1.5rem; }
-
-    .note-row {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
       gap: 10px;
     }
 
-    .note-pill {
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255,209,102,.06);
-      color: var(--warning);
-      font-size: .82rem;
+    .node {
+      min-height: 105px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: center;
+
+      padding: 18px 12px;
+
+      text-align: center;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 12px;
+
+      background:
+        var(--panel);
+
+      transition: .2s ease;
     }
+
+    .node:hover {
+      border-color:
+        var(--border-hover);
+
+      transform:
+        translateY(-2px);
+    }
+
+    .node-icon {
+      font-size: 1.45rem;
+
+      margin-bottom: 7px;
+    }
+
+    .node strong {
+      display: block;
+
+      font-size: .93rem;
+    }
+
+    .node small {
+      color: var(--muted);
+
+      font-size: .72rem;
+    }
+
+    .arrow {
+      text-align: center;
+
+      color:
+        var(--accent);
+
+      font-size: 1.35rem;
+    }
+
+
+    /* =========================================================
+       SECONDARY ARCHITECTURE
+    ========================================================= */
+
+    .network-note {
+      margin-top: 15px;
+
+      padding: 16px 18px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 11px;
+
+      background:
+        rgba(124,58,237,.035);
+
+      color: var(--muted);
+
+      font-size: .85rem;
+    }
+
+    .network-note strong {
+      color: var(--accent-3);
+    }
+
+
+    /* =========================================================
+       COMPONENT CARDS
+    ========================================================= */
+
+    .cards {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+
+      padding: 22px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(23,17,38,.95),
+          rgba(13,9,24,.95)
+        );
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 14px;
+
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+
+      box-shadow:
+        0 10px 35px
+        rgba(0,0,0,.16);
+    }
+
+    .card:hover {
+      transform:
+        translateY(-4px);
+
+      border-color:
+        var(--border-hover);
+
+      box-shadow:
+        0 15px 40px
+        rgba(124,58,237,.12);
+    }
+
+    .card .icon {
+      font-size: 1.5rem;
+
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      color: var(--muted);
+
+      font-size: .91rem;
+    }
+
+    .tech {
+      margin-top: 17px;
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 7px;
+    }
+
+    .tag {
+      padding:
+        5px
+        9px;
+
+      border-radius: 7px;
+
+      background:
+        rgba(124,58,237,.10);
+
+      border:
+        1px solid
+        rgba(169,112,255,.20);
+
+      color:
+        #d8c2ff;
+
+      font-size: .75rem;
+    }
+
+
+    /* =========================================================
+       AUTOMATION
+    ========================================================= */
 
     .automation-flow {
       margin-top: 18px;
+
       padding: 24px;
-      background: var(--panel);
-      border: 1px solid var(--border);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(23,17,38,.95),
+          rgba(13,9,24,.95)
+        );
+
+      border:
+        1px solid
+        var(--border);
+
       border-radius: 14px;
+
       overflow-x: auto;
     }
 
     .automation-track {
-      min-width: 700px;
+      min-width: 800px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       gap: 12px;
     }
 
     .automation-node {
-      min-width: 150px;
+      min-width: 145px;
+
       padding: 18px;
+
       text-align: center;
-      border: 1px solid var(--border);
+
+      border:
+        1px solid
+        var(--border);
+
       border-radius: 12px;
-      background: var(--panel-2);
-    }
 
-    .automation-node strong { display: block; margin-bottom: 4px; }
-    .automation-node small { color: var(--muted); }
+      background:
+        var(--panel-2);
 
-    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-    .card {
-      padding: 22px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
       transition: .2s;
     }
 
-    .card:hover { transform: translateY(-3px); border-color: rgba(66,245,155,.55); }
-    .card .icon { font-size: 1.5rem; margin-bottom: 12px; }
-    .card h3 { margin-bottom: 6px; }
-    .card p { color: var(--muted); font-size: .94rem; }
-
-    .tech { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
-
-    .tag {
-      padding: 5px 9px;
-      border-radius: 6px;
-      background: rgba(66,245,155,.06);
-      border: 1px solid var(--border);
-      color: #bcebd1;
-      font-size: .78rem;
+    .automation-node:hover {
+      border-color:
+        var(--accent);
     }
 
-    .docs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .automation-node strong {
+      display: block;
+
+      margin-bottom: 4px;
+    }
+
+    .automation-node small {
+      color: var(--muted);
+
+      font-size: .72rem;
+    }
+
+    .automation-arrow {
+      color:
+        var(--accent);
+
+      font-size: 1.3rem;
+    }
+
+
+    /* =========================================================
+       SOC WORKFLOW
+    ========================================================= */
+
+    .soc-workflow {
+      display: grid;
+
+      grid-template-columns:
+        repeat(5, 1fr);
+
+      gap: 10px;
+    }
+
+    .workflow-step {
+      padding: 20px 14px;
+
+      text-align: center;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 12px;
+
+      background:
+        var(--panel);
+    }
+
+    .workflow-number {
+      display: inline-flex;
+
+      width: 28px;
+      height: 28px;
+
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background:
+        rgba(124,58,237,.15);
+
+      border:
+        1px solid
+        rgba(169,112,255,.25);
+
+      color:
+        var(--accent);
+
+      font-size: .75rem;
+
+      font-weight: 900;
+
+      margin-bottom: 9px;
+    }
+
+    .workflow-step h3 {
+      font-size: .9rem;
+
+      margin-bottom: 4px;
+    }
+
+    .workflow-step p {
+      color: var(--muted);
+
+      font-size: .74rem;
+    }
+
+
+    /* =========================================================
+       DOCUMENTATION
+    ========================================================= */
+
+    .docs {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 12px;
+    }
 
     .doc {
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       gap: 15px;
-      padding: 17px 18px;
-      border: 1px solid var(--border);
-      background: var(--panel);
+
+      padding:
+        17px 18px;
+
+      border:
+        1px solid
+        var(--border);
+
+      background:
+        var(--panel);
+
       border-radius: 11px;
+
       transition: .2s;
     }
 
-    .doc:hover { border-color: var(--accent); color: var(--accent); }
-    .doc small { display: block; color: var(--muted); margin-top: 2px; }
+    .doc:hover {
+      border-color:
+        var(--accent);
 
-    .status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-
-    .status { padding: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
-
-    .status .state {
-      font-size: .78rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .08em;
+      transform:
+        translateX(2px);
     }
 
-    .status .state.live { color: var(--accent); }
-    .status .state.planned { color: var(--warning); }
-    .status .state.hold { color: var(--muted); }
+    .doc-title {
+      font-weight: 700;
+    }
 
-    .status h3 { margin-top: 5px; }
+    .doc small {
+      display: block;
 
-    .timeline { border-left: 1px solid var(--border); margin-left: 8px; padding-left: 25px; }
+      color: var(--muted);
 
-    .timeline-item { position: relative; margin-bottom: 22px; }
+      margin-top: 2px;
+
+      font-size: .76rem;
+    }
+
+    .doc-arrow {
+      color:
+        var(--accent);
+
+      font-size: 1.2rem;
+    }
+
+
+    /* =========================================================
+       STATUS
+    ========================================================= */
+
+    .status-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 12px;
+    }
+
+    .status {
+      padding: 19px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(23,17,38,.95),
+          rgba(13,9,24,.95)
+        );
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 12px;
+    }
+
+    .status .state {
+      font-size: .72rem;
+
+      font-weight: 900;
+
+      text-transform: uppercase;
+
+      letter-spacing: .09em;
+    }
+
+    .state.active {
+      color:
+        var(--success);
+    }
+
+    .state.lab {
+      color:
+        var(--accent);
+    }
+
+    .state.planned {
+      color:
+        var(--warning);
+    }
+
+    .state.testing {
+      color:
+        var(--info);
+    }
+
+    .status h3 {
+      margin-top: 5px;
+
+      font-size: .96rem;
+    }
+
+    .status p {
+      color: var(--muted);
+
+      font-size: .76rem;
+
+      margin-top: 5px;
+    }
+
+
+    /* =========================================================
+       TIMELINE
+    ========================================================= */
+
+    .timeline {
+      border-left:
+        1px solid
+        var(--border);
+
+      margin-left: 8px;
+
+      padding-left: 25px;
+    }
+
+    .timeline-item {
+      position: relative;
+
+      margin-bottom: 25px;
+    }
 
     .timeline-item::before {
       content: "";
+
       position: absolute;
-      width: 9px; height: 9px;
+
+      width: 9px;
+      height: 9px;
+
       border-radius: 50%;
-      background: var(--accent);
-      left: -30px; top: 8px;
-      box-shadow: 0 0 12px rgba(66,245,155,.5);
+
+      background:
+        var(--accent);
+
+      left: -30px;
+
+      top: 8px;
+
+      box-shadow:
+        0 0 12px
+        rgba(169,112,255,.65);
     }
 
-    .timeline-item p { color: var(--muted); }
+    .timeline-item h3 {
+      font-size: .98rem;
+    }
+
+    .timeline-item p {
+      color: var(--muted);
+
+      font-size: .84rem;
+
+      margin-top: 3px;
+    }
+
+
+    /* =========================================================
+       HIGHLIGHT
+    ========================================================= */
 
     .highlight {
       margin-top: 24px;
-      padding: 20px;
-      border: 1px solid var(--border);
+
+      padding: 21px;
+
+      border:
+        1px solid
+        rgba(169,112,255,.2);
+
       border-radius: 12px;
-      background: rgba(66,245,155,.035);
+
+      background:
+        rgba(124,58,237,.045);
     }
 
-    .highlight strong { color: var(--accent); }
+    .highlight strong {
+      color:
+        var(--accent-3);
+    }
 
-    footer {
-      border-top: 1px solid var(--border);
-      margin-top: 30px;
-      padding: 30px 0 45px;
+    .highlight p {
       color: var(--muted);
-      text-align: center;
+
+      margin-top: 5px;
+
       font-size: .88rem;
     }
 
-    @media (max-width: 950px) {
-      .cards { grid-template-columns: 1fr 1fr; }
-      .status-grid { grid-template-columns: 1fr 1fr; }
+
+    /* =========================================================
+       TERMINAL
+    ========================================================= */
+
+    .terminal {
+      margin-top: 20px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 13px;
+
+      overflow: hidden;
+
+      background:
+        #090711;
+
+      box-shadow:
+        0 15px 45px
+        rgba(0,0,0,.3);
     }
 
-    @media (max-width: 620px) {
-      .nav-links { display: none; }
-      .hero { padding-top: 65px; }
-      .cards, .docs, .status-grid { grid-template-columns: 1fr; }
-      .architecture { padding: 18px; }
+    .terminal-bar {
+      display: flex;
+
+      align-items: center;
+
+      gap: 7px;
+
+      padding:
+        11px 14px;
+
+      border-bottom:
+        1px solid
+        var(--border);
+
+      background:
+        var(--panel);
     }
+
+    .terminal-dot {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background:
+        var(--border-hover);
+    }
+
+    .terminal-title {
+      margin-left: 6px;
+
+      color:
+        var(--muted);
+
+      font-size: .72rem;
+    }
+
+    .terminal-body {
+      padding: 20px;
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+
+      font-size: .8rem;
+
+      color:
+        #cfc3e8;
+
+      overflow-x: auto;
+    }
+
+    .terminal-line {
+      margin-bottom: 6px;
+    }
+
+    .prompt {
+      color:
+        var(--accent);
+    }
+
+    .success-text {
+      color:
+        var(--success);
+    }
+
+    .warning-text {
+      color:
+        var(--warning);
+    }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    footer {
+      border-top:
+        1px solid
+        var(--border);
+
+      margin-top: 30px;
+
+      padding:
+        30px
+        0
+        45px;
+
+      color:
+        var(--muted);
+
+      text-align: center;
+
+      font-size: .8rem;
+    }
+
+    .footer-brand {
+      color:
+        var(--accent);
+
+      font-weight: 800;
+
+      margin-bottom: 5px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 950px) {
+
+      .cards {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+      .status-grid {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+      .soc-workflow {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+    }
+
+
+    @media (max-width: 650px) {
+
+      .container {
+        width:
+          min(
+            var(--max),
+            calc(100% - 24px)
+          );
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 70px;
+      }
+
+      section {
+        padding:
+          48px 0;
+      }
+
+      .cards,
+      .docs,
+      .status-grid,
+      .soc-workflow {
+        grid-template-columns:
+          1fr;
+      }
+
+      .architecture {
+        padding: 18px;
+      }
+
+      .architecture-title {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 4px;
+      }
+
+      .highlight {
+        padding: 17px;
+      }
+    }
+
   </style>
 </head>
 
+
 <body>
 
+
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
+
 <nav>
-  <div class="container nav-inner">
-    <a class="brand" href="#"><span>▣</span> HYBRID HOME SOC LAB</a>
-    <div class="nav-links">
-      <a href="#architecture">Architecture</a>
-      <a href="#components">Components</a>
-      <a href="#automation">Automation</a>
-      <a href="#docs">Documentation</a>
-      <a href="#status">Status</a>
-    </div>
-  </div>
-</nav>
 
-<header class="hero">
-  <div class="container">
-    <div class="badge"><span class="dot"></span> All-local build, actively in progress</div>
-    <h1>A home SOC built to <span>watch, detect, and triage</span> — from scratch, on my own hardware.</h1>
-    <p>
-      A fully local security operations lab: a segmented pfSense perimeter feeding an Ubuntu
-      defender host and a Kali attack box, an n8n automation layer, and a standalone ELK stack
-      going in for centralized log analysis. No cloud dependency this round — every piece runs
-      on hardware I control end to end.
-    </p>
-    <div class="actions">
-      <a class="btn primary" href="#architecture">View architecture</a>
-      <a class="btn" href="#docs">Read the docs</a>
-    </div>
-  </div>
-</header>
-
-<section id="architecture">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">System Design</div>
-      <h2>Architecture</h2>
-      <p>Everything runs locally under VMware Workstation Pro. pfSense segments traffic into a guest
-      VLAN; the defender and attacker VMs live inside it, with logs headed for a dedicated ELK stack.</p>
-    </div>
-
-    <div class="architecture">
-      <div class="flow">
-        <div class="node"><strong>Kali VM</strong><small>Attacker</small></div>
-        <div class="arrow">→</div>
-        <div class="node"><strong>pfSense</strong><small>Perimeter / VLAN</small></div>
-        <div class="arrow">→</div>
-        <div class="node"><strong>Ubuntu Desktop</strong><small>Defender · DVWA + Juice Shop</small></div>
-        <div class="arrow">→</div>
-        <div class="node"><strong>ELK Stack</strong><small>Planned · log ingestion</small></div>
-      </div>
-
-      <div class="note-row">
-        <span class="note-pill">n8n VM present, not yet wired back in</span>
-        <span class="note-pill">ELK ingestion source: pfSense, defender, Kali, n8n, host</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="components">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">The Stack</div>
-      <h2>Components</h2>
-      <p>Four VMs plus the host, each with a specific job in the lab.</p>
-    </div>
-
-    <div class="cards">
-      <div class="card">
-        <div class="icon">⛨</div>
-        <h3>pfSense</h3>
-        <p>Perimeter firewall and VLAN segmentation, separating the guest network from the host.</p>
-      </div>
-      <div class="card">
-        <div class="icon">🖥</div>
-        <h3>Ubuntu Desktop — Defender</h3>
-        <p>Vulnerable-by-design target: DVWA and Juice Shop, sitting inside the guest VLAN for attack/detect exercises.</p>
-      </div>
-      <div class="card">
-        <div class="icon">⚔</div>
-        <h3>Kali Desktop VM</h3>
-        <p>Attacker box for running exercises against the defender host and generating the traffic ELK will later ingest.</p>
-      </div>
-      <div class="card">
-        <div class="icon">⚙</div>
-        <h3>n8n VM</h3>
-        <p>Automation layer for the lab. Currently idle, pending re-integration once ELK is up.</p>
-      </div>
-    </div>
-
-    <div class="tech">
-      <span class="tag">VMware Workstation Pro</span>
-      <span class="tag">pfSense</span>
-      <span class="tag">Ubuntu Desktop</span>
-      <span class="tag">Kali Linux</span>
-      <span class="tag">DVWA</span>
-      <span class="tag">Juice Shop</span>
-      <span class="tag">n8n</span>
-      <span class="tag">Elasticsearch</span>
-      <span class="tag">Logstash</span>
-      <span class="tag">Kibana</span>
-    </div>
-  </div>
-</section>
-
-<section id="automation">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Next Build Step</div>
-      <h2>Centralized Logging with ELK</h2>
-      <p>The standalone ELK stack is the current build priority — pulling logs from every VM and the
-      host into one place for detection and investigation, in place of the previous Wazuh/OCI setup.</p>
-    </div>
-
-    <div class="automation-flow">
-      <div class="automation-track">
-        <div class="automation-node"><strong>pfSense</strong><small>firewall logs</small></div>
-        <div class="arrow">→</div>
-        <div class="automation-node"><strong>Logstash</strong><small>parse + ship</small></div>
-        <div class="arrow">→</div>
-        <div class="automation-node"><strong>Elasticsearch</strong><small>index + store</small></div>
-        <div class="arrow">→</div>
-        <div class="automation-node"><strong>Kibana</strong><small>triage + dashboards</small></div>
-      </div>
-    </div>
-
-    <div class="highlight">
-      <strong>Approach:</strong> triage the case queue manually as an L1 analyst first, rather than
-      letting n8n auto-resolve everything — the point of this round is practicing the analyst
-      workflow, not just automating it away.
-    </div>
-  </div>
-</section>
-
-<section id="docs">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Write-ups</div>
-      <h2>Documentation</h2>
-      <p>Investigation notes and build logs from the lab, kept alongside the repo.</p>
-    </div>
-
-    <div class="docs">
-      <a class="doc" href="#">
-        <div><strong>SOC Investigation — SSH Brute-Force</strong><small>Rule 100014 · complete</small></div>
-        <span>→</span>
-      </a>
-      <a class="doc" href="#">
-        <div><strong>Detection Rules 100010–100017</strong><small>SQLi, path traversal, command injection & more</small></div>
-        <span>→</span>
-      </a>
-      <a class="doc" href="#">
-        <div><strong>Build Log — All-Local Rebuild</strong><small>Rationale for moving off OCI/Wazuh</small></div>
-        <span>→</span>
-      </a>
-      <a class="doc" href="#">
-        <div><strong>ELK Stack Setup</strong><small>In progress</small></div>
-        <span>→</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<section id="status">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Where Things Stand</div>
-      <h2>Status</h2>
-    </div>
-
-    <div class="status-grid">
-      <div class="status">
-        <div class="state live">Live</div>
-        <h3>pfSense + VLAN</h3>
-      </div>
-      <div class="status">
-        <div class="state live">Live</div>
-        <h3>Ubuntu Defender</h3>
-      </div>
-      <div class="status">
-        <div class="state planned">Building</div>
-        <h3>ELK Stack</h3>
-      </div>
-      <div class="status">
-        <div class="state hold">On hold</div>
-        <h3>T-Pot + Caldera</h3>
-      </div>
-    </div>
-
-    <div class="timeline">
-      <div class="timeline-item">
-        <strong>OCI trial ended</strong>
-        <p>Wazuh and n8n cloud instances terminated without backup — pivoted to an all-local build.</p>
-      </div>
-      <div class="timeline-item">
-        <strong>Rebuilt on-prem</strong>
-        <p>pfSense, Ubuntu defender (DVWA + Juice Shop), Kali, and n8n VMs stood back up locally.</p>
-      </div>
-      <div class="timeline-item">
-        <strong>Honeypot + adversary emulation shelved</strong>
-        <p>T-Pot and Caldera planned but on hold due to RAM constraints.</p>
-      </div>
-      <div class="timeline-item">
-        <strong>Now building ELK</strong>
-        <p>Standalone Elasticsearch/Logstash/Kibana stack to replace the lost Wazuh setup and ingest logs from every VM.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="container">
-    Hybrid Home SOC Lab — built and documented by garlicbread26
-  </div>
-</footer>
-
-</body>
-</html>
+  <div class="container nav-inne
