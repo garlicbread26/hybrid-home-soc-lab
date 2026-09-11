@@ -22,6 +22,7 @@ No successful SSH authentication was observed during the investigation.
 | Wazuh Version | 4.14.7 |
 | IP Address | 192.168.20.100 |
 | Service | SSH |
+
 ---
 
 ## 3. Detection
@@ -66,6 +67,7 @@ attempt to authenticate using an invalid username.
 
 The raw event data was retained as investigation evidence for
 correlation with other authentication events.
+
 ---
 
 ## 5. Investigation
@@ -156,6 +158,7 @@ rather than a single accidental authentication failure.
 
 The observed pattern was:
 
+```text
 SSH connection attempt
 ↓
 Authentication attempt
@@ -167,6 +170,7 @@ Authentication failure
 Repeated attempt
 ↓
 Wazuh detection
+```
 
 This behaviour is consistent with the simulated SSH brute-force
 scenario.
@@ -325,6 +329,8 @@ MITRE ATT&CK Mapping
 Impact Assessment
         ↓
 Investigation Conclusion
+```
+
 ## 11. Source Analysis
 
 The SSH authentication failures were investigated to identify the originating source.
@@ -354,6 +360,8 @@ Example event pattern:
 
 ```text
 Failed password for invalid user fakeuser from 192.168.20.1
+```
+
 ## 13. Attack Pattern Analysis
 
 Multiple SSH authentication failures were observed during the investigation window.
@@ -376,6 +384,8 @@ Authentication failure
 Repeated attempts
         ↓
 Wazuh Rule 100014 triggered
+```
+
 ## 14. Successful Authentication Check
 
 The investigation checked whether any of the observed SSH attempts resulted in successful authentication.
@@ -415,6 +425,8 @@ Authentication failed
 Repeated attempts detected
         ↓
 Wazuh Rule 100014 generated alerts
+```
+
 ## 16. Source and Target Analysis
 
 The source and target information from the Wazuh event was reviewed to identify the systems involved in the authentication activity.
@@ -466,3 +478,4 @@ Detection: Successful
 Authentication: Failed
 Successful Access: Not Observed
 Confirmed Compromise: No
+```
