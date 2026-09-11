@@ -83,3 +83,4 @@ Alert Type: SSH Brute Force
 Rule ID: 100014
 Source IP: 192.168.10.2
 Target User: fakeuser
+```
