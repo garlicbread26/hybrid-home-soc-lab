@@ -60,7 +60,7 @@ pfSense provides the primary network security and traffic-control layer for the 
                  |                     |
           Ubuntu CLI Instance    Wazuh Instance
           Kali via Docker        Wazuh SIEM
-
+```
 
 ## Network Security Architecture
 
@@ -93,3 +93,4 @@ pfSense
     Ubuntu Desktop
     Test / Defender
        VM
+```
