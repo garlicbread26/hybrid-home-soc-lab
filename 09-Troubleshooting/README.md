@@ -27,3 +27,4 @@ The n8n container was running and Docker showed the port mapping:
 
 ```text
 0.0.0.0:5678->5678/tcp
+```
