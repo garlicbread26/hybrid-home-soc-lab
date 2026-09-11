@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hybrid Home SOC Lab — network security, cloud infrastructure, Wazuh SIEM, detection engineering, SOC investigation, automation and troubleshooting.">
+  <meta name="description" content="Hybrid Home SOC Lab — network security, ELK-based log analysis, detection engineering, SOC investigation, and automation on a fully local home lab.">
   <title>Hybrid Home SOC Lab</title>
 
   <style>
@@ -34,15 +34,9 @@
       line-height: 1.6;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
 
-    .container {
-      width: min(var(--max), calc(100% - 36px));
-      margin: auto;
-    }
+    .container { width: min(var(--max), calc(100% - 36px)); margin: auto; }
 
     nav {
       position: sticky;
@@ -61,30 +55,13 @@
       gap: 20px;
     }
 
-    .brand {
-      font-weight: 800;
-      letter-spacing: .04em;
-    }
+    .brand { font-weight: 800; letter-spacing: .04em; }
+    .brand span { color: var(--accent); }
 
-    .brand span {
-      color: var(--accent);
-    }
+    .nav-links { display: flex; gap: 20px; color: var(--muted); font-size: .92rem; }
+    .nav-links a:hover { color: var(--accent); }
 
-    .nav-links {
-      display: flex;
-      gap: 20px;
-      color: var(--muted);
-      font-size: .92rem;
-    }
-
-    .nav-links a:hover {
-      color: var(--accent);
-    }
-
-    .hero {
-      padding: 92px 0 70px;
-      text-align: center;
-    }
+    .hero { padding: 92px 0 70px; text-align: center; }
 
     .badge {
       display: inline-flex;
@@ -100,9 +77,7 @@
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+      width: 8px; height: 8px; border-radius: 50%;
       background: var(--accent);
       box-shadow: 0 0 12px var(--accent);
     }
@@ -113,17 +88,9 @@
       letter-spacing: -.045em;
       margin-bottom: 22px;
     }
+    h1 span { color: var(--accent); }
 
-    h1 span {
-      color: var(--accent);
-    }
-
-    .hero p {
-      max-width: 780px;
-      margin: auto;
-      color: var(--muted);
-      font-size: 1.08rem;
-    }
+    .hero p { max-width: 780px; margin: auto; color: var(--muted); font-size: 1.08rem; }
 
     .actions {
       margin-top: 30px;
@@ -144,25 +111,12 @@
       transition: .2s;
     }
 
-    .btn.primary {
-      background: var(--accent);
-      color: #04100a;
-      border-color: var(--accent);
-      font-weight: 800;
-    }
+    .btn.primary { background: var(--accent); color: #04100a; border-color: var(--accent); font-weight: 800; }
+    .btn:hover { transform: translateY(-2px); border-color: var(--accent); }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-    }
+    section { padding: 58px 0; }
 
-    section {
-      padding: 58px 0;
-    }
-
-    .section-head {
-      margin-bottom: 28px;
-    }
+    .section-head { margin-bottom: 28px; }
 
     .eyebrow {
       color: var(--accent);
@@ -172,16 +126,8 @@
       text-transform: uppercase;
     }
 
-    h2 {
-      font-size: clamp(1.8rem, 4vw, 2.7rem);
-      margin-top: 5px;
-    }
-
-    .section-head p {
-      color: var(--muted);
-      max-width: 760px;
-      margin-top: 8px;
-    }
+    h2 { font-size: clamp(1.8rem, 4vw, 2.7rem); margin-top: 5px; }
+    .section-head p { color: var(--muted); max-width: 760px; margin-top: 8px; }
 
     .architecture {
       padding: 28px;
@@ -192,33 +138,40 @@
     }
 
     .flow {
-      min-width: 720px;
+      min-width: 760px;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       align-items: center;
       gap: 12px;
     }
 
     .node {
-      padding: 18px 12px;
+      padding: 18px 10px;
       text-align: center;
       border: 1px solid var(--border);
       border-radius: 12px;
       background: var(--panel);
     }
 
-    .node strong {
-      display: block;
+    .node strong { display: block; }
+    .node small { color: var(--muted); }
+
+    .arrow { text-align: center; color: var(--accent); font-size: 1.5rem; }
+
+    .note-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .node small {
-      color: var(--muted);
-    }
-
-    .arrow {
-      text-align: center;
-      color: var(--accent);
-      font-size: 1.5rem;
+    .note-pill {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,209,102,.06);
+      color: var(--warning);
+      font-size: .82rem;
     }
 
     .automation-flow {
@@ -247,20 +200,10 @@
       background: var(--panel-2);
     }
 
-    .automation-node strong {
-      display: block;
-      margin-bottom: 4px;
-    }
+    .automation-node strong { display: block; margin-bottom: 4px; }
+    .automation-node small { color: var(--muted); }
 
-    .automation-node small {
-      color: var(--muted);
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 
     .card {
       padding: 22px;
@@ -270,31 +213,12 @@
       transition: .2s;
     }
 
-    .card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(66,245,155,.55);
-    }
+    .card:hover { transform: translateY(-3px); border-color: rgba(66,245,155,.55); }
+    .card .icon { font-size: 1.5rem; margin-bottom: 12px; }
+    .card h3 { margin-bottom: 6px; }
+    .card p { color: var(--muted); font-size: .94rem; }
 
-    .card .icon {
-      font-size: 1.5rem;
-      margin-bottom: 12px;
-    }
-
-    .card h3 {
-      margin-bottom: 6px;
-    }
-
-    .card p {
-      color: var(--muted);
-      font-size: .94rem;
-    }
-
-    .tech {
-      margin-top: 18px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    .tech { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
 
     .tag {
       padding: 5px 9px;
@@ -305,11 +229,7 @@
       font-size: .78rem;
     }
 
-    .docs {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
+    .docs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
     .doc {
       display: flex;
@@ -323,68 +243,41 @@
       transition: .2s;
     }
 
-    .doc:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .doc:hover { border-color: var(--accent); color: var(--accent); }
+    .doc small { display: block; color: var(--muted); margin-top: 2px; }
 
-    .doc small {
-      display: block;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    .status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 
-    .status-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .status {
-      padding: 18px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
+    .status { padding: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
 
     .status .state {
-      color: var(--accent);
       font-size: .78rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: .08em;
     }
 
-    .status h3 {
-      margin-top: 5px;
-    }
+    .status .state.live { color: var(--accent); }
+    .status .state.planned { color: var(--warning); }
+    .status .state.hold { color: var(--muted); }
 
-    .timeline {
-      border-left: 1px solid var(--border);
-      margin-left: 8px;
-      padding-left: 25px;
-    }
+    .status h3 { margin-top: 5px; }
 
-    .timeline-item {
-      position: relative;
-      margin-bottom: 22px;
-    }
+    .timeline { border-left: 1px solid var(--border); margin-left: 8px; padding-left: 25px; }
+
+    .timeline-item { position: relative; margin-bottom: 22px; }
 
     .timeline-item::before {
       content: "";
       position: absolute;
-      width: 9px;
-      height: 9px;
+      width: 9px; height: 9px;
       border-radius: 50%;
       background: var(--accent);
-      left: -30px;
-      top: 8px;
+      left: -30px; top: 8px;
       box-shadow: 0 0 12px rgba(66,245,155,.5);
     }
 
-    .timeline-item p {
-      color: var(--muted);
-    }
+    .timeline-item p { color: var(--muted); }
 
     .highlight {
       margin-top: 24px;
@@ -394,9 +287,7 @@
       background: rgba(66,245,155,.035);
     }
 
-    .highlight strong {
-      color: var(--accent);
-    }
+    .highlight strong { color: var(--accent); }
 
     footer {
       border-top: 1px solid var(--border);
@@ -407,34 +298,16 @@
       font-size: .88rem;
     }
 
-    @media (max-width: 850px) {
-      .cards {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .status-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+    @media (max-width: 950px) {
+      .cards { grid-template-columns: 1fr 1fr; }
+      .status-grid { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 620px) {
-      .nav-links {
-        display: none;
-      }
-
-      .hero {
-        padding-top: 65px;
-      }
-
-      .cards,
-      .docs,
-      .status-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .architecture {
-        padding: 18px;
-      }
+      .nav-links { display: none; }
+      .hero { padding-top: 65px; }
+      .cards, .docs, .status-grid { grid-template-columns: 1fr; }
+      .architecture { padding: 18px; }
     }
   </style>
 </head>
@@ -443,10 +316,7 @@
 
 <nav>
   <div class="container nav-inner">
-    <a class="brand" href="#">
-      <span>▣</span> HYBRID HOME SOC LAB
-    </a>
-
+    <a class="brand" href="#"><span>▣</span> HYBRID HOME SOC LAB</a>
     <div class="nav-links">
       <a href="#architecture">Architecture</a>
       <a href="#components">Components</a>
@@ -459,5 +329,205 @@
 
 <header class="hero">
   <div class="container">
+    <div class="badge"><span class="dot"></span> All-local build, actively in progress</div>
+    <h1>A home SOC built to <span>watch, detect, and triage</span> — from scratch, on my own hardware.</h1>
+    <p>
+      A fully local security operations lab: a segmented pfSense perimeter feeding an Ubuntu
+      defender host and a Kali attack box, an n8n automation layer, and a standalone ELK stack
+      going in for centralized log analysis. No cloud dependency this round — every piece runs
+      on hardware I control end to end.
+    </p>
+    <div class="actions">
+      <a class="btn primary" href="#architecture">View architecture</a>
+      <a class="btn" href="#docs">Read the docs</a>
+    </div>
+  </div>
+</header>
 
-    <div class="
+<section id="architecture">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">System Design</div>
+      <h2>Architecture</h2>
+      <p>Everything runs locally under VMware Workstation Pro. pfSense segments traffic into a guest
+      VLAN; the defender and attacker VMs live inside it, with logs headed for a dedicated ELK stack.</p>
+    </div>
+
+    <div class="architecture">
+      <div class="flow">
+        <div class="node"><strong>Kali VM</strong><small>Attacker</small></div>
+        <div class="arrow">→</div>
+        <div class="node"><strong>pfSense</strong><small>Perimeter / VLAN</small></div>
+        <div class="arrow">→</div>
+        <div class="node"><strong>Ubuntu Desktop</strong><small>Defender · DVWA + Juice Shop</small></div>
+        <div class="arrow">→</div>
+        <div class="node"><strong>ELK Stack</strong><small>Planned · log ingestion</small></div>
+      </div>
+
+      <div class="note-row">
+        <span class="note-pill">n8n VM present, not yet wired back in</span>
+        <span class="note-pill">ELK ingestion source: pfSense, defender, Kali, n8n, host</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="components">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">The Stack</div>
+      <h2>Components</h2>
+      <p>Four VMs plus the host, each with a specific job in the lab.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">⛨</div>
+        <h3>pfSense</h3>
+        <p>Perimeter firewall and VLAN segmentation, separating the guest network from the host.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🖥</div>
+        <h3>Ubuntu Desktop — Defender</h3>
+        <p>Vulnerable-by-design target: DVWA and Juice Shop, sitting inside the guest VLAN for attack/detect exercises.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚔</div>
+        <h3>Kali Desktop VM</h3>
+        <p>Attacker box for running exercises against the defender host and generating the traffic ELK will later ingest.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚙</div>
+        <h3>n8n VM</h3>
+        <p>Automation layer for the lab. Currently idle, pending re-integration once ELK is up.</p>
+      </div>
+    </div>
+
+    <div class="tech">
+      <span class="tag">VMware Workstation Pro</span>
+      <span class="tag">pfSense</span>
+      <span class="tag">Ubuntu Desktop</span>
+      <span class="tag">Kali Linux</span>
+      <span class="tag">DVWA</span>
+      <span class="tag">Juice Shop</span>
+      <span class="tag">n8n</span>
+      <span class="tag">Elasticsearch</span>
+      <span class="tag">Logstash</span>
+      <span class="tag">Kibana</span>
+    </div>
+  </div>
+</section>
+
+<section id="automation">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Next Build Step</div>
+      <h2>Centralized Logging with ELK</h2>
+      <p>The standalone ELK stack is the current build priority — pulling logs from every VM and the
+      host into one place for detection and investigation, in place of the previous Wazuh/OCI setup.</p>
+    </div>
+
+    <div class="automation-flow">
+      <div class="automation-track">
+        <div class="automation-node"><strong>pfSense</strong><small>firewall logs</small></div>
+        <div class="arrow">→</div>
+        <div class="automation-node"><strong>Logstash</strong><small>parse + ship</small></div>
+        <div class="arrow">→</div>
+        <div class="automation-node"><strong>Elasticsearch</strong><small>index + store</small></div>
+        <div class="arrow">→</div>
+        <div class="automation-node"><strong>Kibana</strong><small>triage + dashboards</small></div>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <strong>Approach:</strong> triage the case queue manually as an L1 analyst first, rather than
+      letting n8n auto-resolve everything — the point of this round is practicing the analyst
+      workflow, not just automating it away.
+    </div>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Write-ups</div>
+      <h2>Documentation</h2>
+      <p>Investigation notes and build logs from the lab, kept alongside the repo.</p>
+    </div>
+
+    <div class="docs">
+      <a class="doc" href="#">
+        <div><strong>SOC Investigation — SSH Brute-Force</strong><small>Rule 100014 · complete</small></div>
+        <span>→</span>
+      </a>
+      <a class="doc" href="#">
+        <div><strong>Detection Rules 100010–100017</strong><small>SQLi, path traversal, command injection & more</small></div>
+        <span>→</span>
+      </a>
+      <a class="doc" href="#">
+        <div><strong>Build Log — All-Local Rebuild</strong><small>Rationale for moving off OCI/Wazuh</small></div>
+        <span>→</span>
+      </a>
+      <a class="doc" href="#">
+        <div><strong>ELK Stack Setup</strong><small>In progress</small></div>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Where Things Stand</div>
+      <h2>Status</h2>
+    </div>
+
+    <div class="status-grid">
+      <div class="status">
+        <div class="state live">Live</div>
+        <h3>pfSense + VLAN</h3>
+      </div>
+      <div class="status">
+        <div class="state live">Live</div>
+        <h3>Ubuntu Defender</h3>
+      </div>
+      <div class="status">
+        <div class="state planned">Building</div>
+        <h3>ELK Stack</h3>
+      </div>
+      <div class="status">
+        <div class="state hold">On hold</div>
+        <h3>T-Pot + Caldera</h3>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <strong>OCI trial ended</strong>
+        <p>Wazuh and n8n cloud instances terminated without backup — pivoted to an all-local build.</p>
+      </div>
+      <div class="timeline-item">
+        <strong>Rebuilt on-prem</strong>
+        <p>pfSense, Ubuntu defender (DVWA + Juice Shop), Kali, and n8n VMs stood back up locally.</p>
+      </div>
+      <div class="timeline-item">
+        <strong>Honeypot + adversary emulation shelved</strong>
+        <p>T-Pot and Caldera planned but on hold due to RAM constraints.</p>
+      </div>
+      <div class="timeline-item">
+        <strong>Now building ELK</strong>
+        <p>Standalone Elasticsearch/Logstash/Kibana stack to replace the lost Wazuh setup and ingest logs from every VM.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    Hybrid Home SOC Lab — built and documented by garlicbread26
+  </div>
+</footer>
+
+</body>
+</html>
