@@ -2,93 +2,98 @@
 
 ## Overview
 
-This lab is a hybrid home Security Operations Center (SOC) environment combining on-premises virtualization and network security with cloud infrastructure.
+This document describes the **local-first** architecture of the lab. The repository also preserves the earlier OCI/Tailscale deployment as historical project evidence.
 
-The lab currently consists of:
+### Current local environment
 
 - Windows physical host
 - VMware Workstation Pro
-- pfSense firewall
+- pfSense firewall and router
+- Guest VLAN segmentation
 - Suricata IDS/IPS
 - pfBlockerNG
-- Ubuntu Desktop test/defender VM
-- Oracle Cloud Infrastructure (OCI) VCN
-- Two OCI compute instances
-- Tailscale VPN for private connectivity and CGNAT bypass
-- Kali Linux running through Docker
-- Wazuh Server / SIEM
-- Windows Sysmon telemetry
-- Wazuh Agent
-- pfSense Syslog telemetry
+- Kali Linux attacker VM
+- Ubuntu Desktop defender/test VM
+- DVWA and OWASP Juice Shop test targets
+- n8n automation environment
+- Standalone ELK stack — current build: Elasticsearch, Logstash and Kibana
 
-## Network Architecture
+### Historical environment
+
+The earlier phase used Oracle Cloud Infrastructure, Tailscale, an OCI Ubuntu instance, Kali through Docker, and a Wazuh server. Those components are **not part of the active architecture now**.
+
+---
+
+## Current Local Architecture
 
 ```text
                          INTERNET
-                            |
-                            |
-                  +--------------------+
-                  |   Windows Host     |
-                  |   Physical Laptop  |
-                  |                    |
-                  | VMware Workstation |
-                  +---------+----------+
-                            |
-                     +------+------+
-                     |   pfSense   |
-                     |  Firewall   |
-                     |            |
-                     |  Suricata  |
-                     | pfBlockerNG|
-                     +------+------+
-                            |
-                     Local Lab Network
-                            |
-                   +--------+--------+
-                   |                 |
-          +--------+-------+   +-----+----------+
-          | Ubuntu Desktop |   | Windows Host   |
-          | Test/Defender  |   | Sysmon         |
-          | VM             |   | Wazuh Agent    |
-          +----------------+   +----------------+
-
-                            |
-                       Tailscale VPN
-                       CGNAT Bypass
-                            |
-                            |
-                 +----------+-----------+
-                 |       OCI VCN        |
-                 |                      |
-        +--------+---------+  +---------+--------+
-        | Ubuntu CLI       |  | Wazuh Server     |
-        | OCI Instance     |  | OCI Instance     |
-        |                  |  |                  |
-        | Kali via Docker  |  | Wazuh SIEM       |
-        +------------------+  +------------------+
+                             |
+                             v
+                    +-------------------+
+                    |     pfSense       |
+                    | Firewall / Router |
+                    | VLAN Segmentation |
+                    | Suricata /        |
+                    | pfBlockerNG       |
+                    +---------+---------+
+                              |
+                    +---------+---------+
+                    |                   |
+                    v                   v
+             +-------------+     +-------------+
+             | Kali Linux  |     | Ubuntu      |
+             | Attacker    |     | Defender /  |
+             |             |     | Test Host   |
+             +-------------+     +------+------+
+                                        |
+                              +---------+---------+
+                              | DVWA / Juice Shop |
+                              | Controlled Targets|
+                              +---------+---------+
+                                        |
+                                  Logs / Events
+                                        |
+                                        v
+                              +-------------------+
+                              |     Logstash      |
+                              | Ingest / Parse    |
+                              +---------+---------+
+                                        |
+                                        v
+                              +-------------------+
+                              |  Elasticsearch    |
+                              |  Store / Search   |
+                              +---------+---------+
+                                        |
+                                        v
+                              +-------------------+
+                              |      Kibana       |
+                              | Hunt / Visualize  |
+                              +---------+---------+
+                                        |
+                                        v
+                              +-------------------+
+                              |      n8n          |
+                              | Automation / SOC  |
+                              +-------------------+
+```
 
 ## Architecture Components
 
 ### Windows Physical Host
 
-The Windows laptop is the physical host for the on-premises portion of the lab.
-
-VMware Workstation Pro runs the local virtual infrastructure on this host.
+The Windows laptop is the physical host for the local lab. VMware Workstation Pro runs the virtual security environment on this machine.
 
 ### VMware Workstation Pro
 
-VMware provides the virtualization layer for the local lab.
-
-The main virtual systems are:
-
-- pfSense firewall
-- Ubuntu Desktop test/defender VM
+VMware provides the virtualization layer for the local environment. The main security VMs include pfSense, Kali Linux, Ubuntu Desktop, and the supporting automation/SIEM workloads as hardware resources allow.
 
 ### pfSense Security Layer
 
-pfSense acts as the network security gateway for the local environment.
+pfSense is the network security gateway for the lab. It provides routing, firewall policy, VLAN segmentation, and network telemetry.
 
-Security services deployed on pfSense include:
+Security services documented in the lab include:
 
 - Suricata IDS/IPS
 - pfBlockerNG
@@ -96,51 +101,113 @@ Security services deployed on pfSense include:
 - Guest VLAN
 - Syslog forwarding
 
-### Guest VLAN
+### Kali Linux
 
-The Ubuntu Desktop test/defender VM is placed behind pfSense on the Guest VLAN.
+Kali is the controlled attacker/test side of the environment. It is used to generate reconnaissance, authentication, network, and web-security activity against deliberately vulnerable lab targets.
 
-This provides an isolated environment for generating and observing security activity.
+### Ubuntu Desktop / Test Environment
 
-### Tailscale VPN
+Ubuntu provides the defender/test side of the lab. DVWA and OWASP Juice Shop are used as controlled web-security targets for attack and detection exercises.
 
-Tailscale provides private connectivity between the on-premises lab and OCI.
+### ELK — Current Build
 
-It is used to overcome the CGNAT limitation of the home Internet connection.
-
-The connection path is:
+The current SIEM/logging direction is a standalone local ELK stack:
 
 ```text
-Local Lab
-    |
-  pfSense
-    |
-Tailscale
-    |
-  OCI VCN
+pfSense / Linux / Windows / Kali / Applications
+                         |
+                         v
+                    Logstash
+                         |
+                         v
+                  Elasticsearch
+                         |
+                         v
+                      Kibana
+```
 
+The build is intentionally modular so additional telemetry sources can be added without changing the overall SOC workflow.
+
+### n8n Automation
+
+n8n is used for workflow automation. The earlier Wazuh phase validated a Wazuh → Integrator → n8n Webhook → Telegram notification workflow. Future automation can be rebuilt around ELK alerts and investigation data.
+
+---
+
+## Evidence — VMware / Local Lab
+
+The following screenshots are stored in this directory and are rendered directly by GitHub when viewing this README:
 
 ![VMware Host](01-VMware.png)
 
-![pfSense Configuration](02-VMware.png)
+![VMware Configuration](02-VMware.png)
 
-![Ubuntu Test VM](03-VMware.png)
+![Ubuntu Test Environment](03-VMware.png)
 
 ![VMware Network Configuration](04-VMware.png)
 
-## Cloud Architecture
+---
 
-The cloud portion runs inside an Oracle Cloud Infrastructure VCN using two compute instances.
+## Historical Cloud Architecture
+
+The following architecture was previously validated and is retained for documentation/history only:
+
+```text
+Local VMware Lab
+      |
+   pfSense
+      |
+  Tailscale
+      |
+   OCI VCN
+    /    \
+Ubuntu   Wazuh
+ CLI     Server
+  |
+Kali/Docker
+```
+
+Historical evidence:
 
 ![OCI VCN](05-VCN.png)
 
 ![VCN IP Administration](06-VCN-ip-administration.png)
 
-![OCI Compute Instances](07-OCI-instance.png)
-
-## Private Connectivity
-
-Tailscale provides private connectivity between the on-premises lab and cloud infrastructure, allowing communication without relying directly on public addressing.
+![OCI Instances](07-OCI-instance.png)
 
 ![Tailscale Network](08-tailscale-network.png)
 
+> **Status:** Oracle Cloud, Tailscale cloud connectivity, and the OCI Wazuh deployment are historical phases of the project and should not be interpreted as currently running infrastructure.
+
+---
+
+## Security Flow
+
+The lab is built around one repeatable loop:
+
+```text
+Attack Activity
+      |
+      v
+Network / Host Telemetry
+      |
+      v
+Logstash Ingestion
+      |
+      v
+Elasticsearch
+      |
+      v
+Kibana Detection / Hunting
+      |
+      v
+SOC Investigation
+      |
+      v
+n8n Automation
+      |
+      v
+Response / Documentation
+```
+
+This structure lets the project demonstrate networking, Linux/Windows telemetry, SIEM concepts, detection engineering, investigation, and automation in one environment.
